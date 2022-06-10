@@ -4,22 +4,24 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geolocator_platform_interface/geolocator_platform_interface.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:patient/API%20repo/api_constants.dart';
 import 'package:patient/Models/doctor_profile_model.dart';
 import 'package:patient/Models/home_care_categories_model.dart';
 import 'package:patient/Models/home_doctor_speciality_model.dart';
+import 'package:patient/Models/hospital_packages_category_model.dart';
 import 'package:patient/Screens/DoctorScreens/doctor_profile.dart';
 import 'package:patient/Screens/DoctorScreens/doctor_profile_details.dart';
-import 'package:patient/Screens/health_care_sub_categories.dart';
-import 'package:patient/Screens/health_care_categories.dart';
 import 'package:patient/Screens/LAB/lab_profile.dart';
 import 'package:patient/Screens/MYScreens/MyQuestionsScreen.dart';
 import 'package:patient/Screens/aboutconsultation.dart';
 import 'package:patient/Screens/contact_us_form.dart';
 import 'package:patient/Screens/doctor_categories.dart';
-import 'package:patient/Screens/hospital_packages.dart';
-import 'package:patient/Screens/knowledge_forum_screen.dart';
 import 'package:patient/Screens/health_care.dart';
+import 'package:patient/Screens/health_care_categories.dart';
+import 'package:patient/Screens/health_care_sub_categories.dart';
+import 'package:patient/Screens/hospital_packages.dart';
+import 'package:patient/Screens/hospital_packages_categories.dart';
+import 'package:patient/Screens/hospital_packages_sub_categories.dart';
+import 'package:patient/Screens/knowledge_forum_screen.dart';
 import 'package:patient/Screens/search_screen.dart';
 import 'package:patient/Utils/colorsandstyles.dart';
 import 'package:patient/controller/DoctorProfileController/doctor_controller.dart';
@@ -65,12 +67,12 @@ final List<Map<dynamic, dynamic>> hometile = [
   //   'Screen': 'null',
   //   'profile': 'Rectangle -6.png'
   // },
-  // {
-  //   'label': 'Lab Tests',
-  //   // 'Screen': 'null',
-  //   'Screen': LabProfile(),
-  //   'profile': 'Rectangle -2.png'
-  // },
+  {
+    'label': 'Lab Tests',
+    // 'Screen': 'null',
+    'Screen': LabProfile(),
+    'profile': 'Rectangle -2.png'
+  },
   {
     'label': 'Hospital Packages',
     'Screen': HospitalPackages(),
@@ -103,18 +105,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool healthcareLoading = true;
+  bool hospitalPackageLoading = true;
   late HealthCareCategoriesModel healthCareCategories;
+  late HospitalPackagesCatModel hospitalPackages;
 
   bool doctorloading = true;
-  Future<HealthCareCategoriesModel> gethomecareServices() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-
-    var response = await PostData(
-        PARAM_URL: 'get_home_care_services.php',
-        params: {'user_id': preferences.getString('user_id'), 'token': Token});
-
-    return HealthCareCategoriesModel.fromJson(response);
-  }
 
   HomeController _con = HomeController();
   late HomeDoctorSpecialityModel specialities;
@@ -228,10 +223,16 @@ class _HomeScreenState extends State<HomeScreen> {
         _con.specialitybool = false;
       });
     });
-    gethomecareServices().then((value) {
+    _con.gethomecareServices().then((value) {
       setState(() {
         healthCareCategories = value;
         healthcareLoading = false;
+      });
+    });
+    _con.getHospitalPackageCategories().then((value) {
+      setState(() {
+        hospitalPackages = value;
+        hospitalPackageLoading = false;
       });
     });
     _doctorControllercon.getDoctor(context).then((value) {
@@ -795,6 +796,106 @@ class _HomeScreenState extends State<HomeScreen> {
                                             child: Center(
                                               child: Text(
                                                 healthCareCategories
+                                                    .data[index].serviceName,
+                                                style: GoogleFonts.montserrat(
+                                                    fontSize: 12,
+                                                    color: Colors.black,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              ),
+            ),
+
+            SizedBox(
+              height: 15,
+            ),
+            Container(
+              color: Colors.white,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: commonRow(
+                      Title: 'Hospital Packages',
+                      subTitle: 'View all',
+                      value: HospitalPackageCategories(),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 150,
+                    //color: Colors.red,
+                    child: (hospitalPackageLoading)
+                        ? Center(child: CircularProgressIndicator())
+                        : GridView.builder(
+                            scrollDirection: Axis.horizontal,
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                    // maxCrossAxisExtent: 100,
+                                    childAspectRatio: 3 / 4,
+                                    // crossAxisSpacing: 10,
+                                    // mainAxisSpacing: 10,
+                                    crossAxisCount: 1),
+                            itemCount: hospitalPackages.data.length,
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Push(
+                                        context,
+                                        HospitalPackageSubCat(
+                                          cat_id: hospitalPackages
+                                              .data[index].serviceId,
+                                          cat_name: hospitalPackages
+                                              .data[index].serviceName,
+                                          fromHome: true,
+                                        ));
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          blurRadius: 10,
+                                          offset: const Offset(2, 5),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: CircleAvatar(
+                                            radius: 30,
+                                            backgroundImage: NetworkImage(
+                                              hospitalPackages
+                                                  .data[index].image,
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                hospitalPackages
                                                     .data[index].serviceName,
                                                 style: GoogleFonts.montserrat(
                                                     fontSize: 12,

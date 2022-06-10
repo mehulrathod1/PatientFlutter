@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:patient/Models/LAB/my_lab_packages_model.dart';
 import 'package:patient/Models/LAB/my_lab_test_model.dart';
-import 'package:patient/Models/MyModels/my_appointment_model.dart';
-import 'package:patient/Screens/booking_appointment.dart';
+import 'package:patient/Screens/cancel_screen.dart';
 import 'package:patient/Utils/colorsandstyles.dart';
 import 'package:patient/controller/AppointmentController/appointmentController.dart';
-import 'package:patient/controller/My%20Screens%20Controller/my_appointments_controller.dart';
-import 'package:patient/controller/NavigationController.dart';
-import 'package:patient/widgets/commonAppBarLeading.dart';
-import 'package:patient/widgets/common_app_bar_title.dart';
+import 'package:patient/widgets/common_button.dart';
 import 'package:patient/widgets/title_column.dart';
+import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 
 class MyLabAppointments extends StatefulWidget {
   const MyLabAppointments({Key? key}) : super(key: key);
@@ -142,7 +139,7 @@ class _TestAppointmentsState extends State<TestAppointments> {
                                         ? navbarht + 20
                                         : 8.0),
                                 child: Container(
-                                  height: 170,
+                                  height: 200,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.only(
@@ -157,6 +154,7 @@ class _TestAppointmentsState extends State<TestAppointments> {
                                     ],
                                   ),
                                   child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceAround,
                                     mainAxisSize: MainAxisSize.min,
@@ -300,6 +298,35 @@ class _TestAppointmentsState extends State<TestAppointments> {
                                       //     ),
                                       //   ),
                                       // )
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 15.0),
+                                        child: commonBtn(
+                                            s: 'Cancel',
+                                            height: 30,
+                                            textSize: 12,
+                                            width: 100,
+                                            bgcolor: Colors.white,
+                                            textColor: Colors.red,
+                                            borderColor: Colors.red,
+                                            borderWidth: 2,
+                                            onPressed: () {
+                                              pushNewScreen(context,
+                                                      screen: CancelScreen(
+                                                        isLabTest: true,
+                                                        booking_id: details
+                                                            .data[index]
+                                                            .booingId,
+                                                        amount: details
+                                                            .data[index]
+                                                            .ammountPaid,
+                                                      ),
+                                                      withNavBar: false)
+                                                  .then((value) {
+                                                initialize();
+                                              });
+                                            }),
+                                      )
                                     ],
                                   ),
                                 ),
@@ -367,7 +394,7 @@ class _PackagesAppointmentsState extends State<PackagesAppointments> {
                                       ? navbarht + 20
                                       : 8.0),
                               child: Container(
-                                height: 170,
+                                height: 200,
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.only(
@@ -382,6 +409,7 @@ class _PackagesAppointmentsState extends State<PackagesAppointments> {
                                   ],
                                 ),
                                 child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceAround,
                                   mainAxisSize: MainAxisSize.min,
@@ -485,6 +513,34 @@ class _PackagesAppointmentsState extends State<PackagesAppointments> {
                                         ],
                                       ),
                                     ),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 15.0),
+                                      child: commonBtn(
+                                          s: 'Cancel',
+                                          height: 30,
+                                          textSize: 12,
+                                          width: 100,
+                                          bgcolor: Colors.white,
+                                          textColor: Colors.red,
+                                          borderColor: Colors.red,
+                                          borderWidth: 2,
+                                          onPressed: () {
+                                            pushNewScreen(context,
+                                                    screen: CancelScreen(
+                                                      isLabPAckage: true,
+                                                      booking_id: details
+                                                          .data[index].booingId,
+                                                      amount: details
+                                                          .data[index]
+                                                          .ammountPaid,
+                                                    ),
+                                                    withNavBar: false)
+                                                .then((value) {
+                                              initialize();
+                                            });
+                                          }),
+                                    )
                                     // SizedBox(
                                     //   height: 40,
                                     //   width: double.infinity,
